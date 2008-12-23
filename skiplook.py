@@ -1,4 +1,5 @@
 #!/usr/bin/python
+"Like 'look' but using .skip files."
 import sys, os
 
 def skipfilename(filename):
