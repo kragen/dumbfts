@@ -1,9 +1,10 @@
 #!/bin/bash
+# Full-text search query processor.
 set -e
-devel=/home/kragen/devel
-joins="$devel/joins.py"
-msgs="$devel/msgs.py"
-look="$devel/skiplook.py"
+basedir="$(dirname "$0")"
+joins="$basedir/joins.py"
+msgs="$basedir/msgs.py"
+look="$basedir/skiplook.py"
 : ${1?usage: $0 mbox keywords}
 mbox="$1"
 
