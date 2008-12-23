@@ -6,7 +6,9 @@ This is a full-text indexing and search engine for my email, in about
 my 12-gigabyte mailbox in under two seconds on my 700MHz laptop.
 (Which sometimes reduces its clock rate to 550MHz.)  I just updated
 the index after not doing so for three months, and it took about three
-hours to index the two new gigabytes of email.
+hours to index the two new gigabytes of email.  It manages to index
+about 24 megabytes per minute, which is a bit faster than I
+can download my email over my internet connection.
 
 Feature list
 ------------
