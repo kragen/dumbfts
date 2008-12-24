@@ -89,10 +89,10 @@ class MessageReader:
 
             current_offset += nbytes
 
-def index_until(reader, cb, end_bytes):
-    while reader.next_message_offset < end_bytes and not reader.end_of_file:
-        offset = reader.next_message_offset
-        for term in reader.message_terms():
+def index_until(messages, cb, end_bytes):
+    while messages.next_message_offset < end_bytes and not messages.end_of_file:
+        offset = messages.next_message_offset
+        for term in messages.message_terms():
             cb(term, offset)
 
 class SortFailed(Exception): pass
