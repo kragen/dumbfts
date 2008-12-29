@@ -9,14 +9,21 @@ def print_merge_candidates(mboxfile):
     files.sort()
     total = 0
     by_total = []
+    ii = 0
     for size, name in files:
         total += size
         ratio = float(total) / size
         print '%13s %23.23s %14s %.2f×' % (size, name, total, ratio)
-        by_total.append((ratio, name))
+        by_total.append((ratio, name, ii))
+        ii += 1
     by_total.sort(reverse=True)
-    ratio, name = by_total[0]
+    ratio, name, ii = by_total[0]
     print "Best would be merging files up to %s (%.3f×)" % (name, ratio)
+    print "This would reduce the number of index files by %.1f%%" % (
+        100.0*(ii+1)/len(files))
+    print "That is: sort -m %s -o .new.merged-segment" % (
+        ' '.join(name for size, name in files[:ii+1]))
+    print "followed by renaming, deleting the old files, and building the skip file"
     print "(actually doing it isn't implemented yet)"
 
 if __name__ == '__main__':
