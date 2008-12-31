@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys, indexmail, os
 
+min_merge_ratio = 5.0
+
 def print_merge_candidates(mboxfile):
     index_dir = indexmail.index_dir_for(mboxfile)
     files = [(os.stat(os.path.join(index_dir, fname)).st_size, fname)
@@ -18,13 +20,15 @@ def print_merge_candidates(mboxfile):
         ii += 1
     by_total.sort(reverse=True)
     ratio, name, ii = by_total[0]
-    print "Best would be merging files up to %s (%.3f×)" % (name, ratio)
-    print "This would reduce the number of index files by %.1f%%" % (
-        100.0*(ii+1)/len(files))
-    print "That is: LANG=C sort -m %s -o .new.merged-segment" % (
-        ' '.join(name for size, name in files[:ii+1]))
-    print "followed by renaming, deleting the old files, and building the skip file"
-    print "(actually doing it isn't implemented yet)"
+    if ratio > min_merge_ratio:
+        print "Best would be merging files up to %s (%.3f×)" % (name, ratio)
+        print "This would reduce the number of index files by %.1f%%" % (
+            100.0*(ii+1)/len(files))
+        print "That is: LANG=C sort -m %s -o .new.merged-segment" % (
+            ' '.join(name for size, name in files[:ii+1]))
+        print "followed by renaming, deleting the old files,"
+        print "and building the skip file"
+        print "(actually doing it isn't implemented yet)"
 
 if __name__ == '__main__':
     print_merge_candidates(sys.argv[1])
