@@ -21,7 +21,7 @@ def print_merge_candidates(mboxfile):
     print "Best would be merging files up to %s (%.3f×)" % (name, ratio)
     print "This would reduce the number of index files by %.1f%%" % (
         100.0*(ii+1)/len(files))
-    print "That is: sort -m %s -o .new.merged-segment" % (
+    print "That is: LANG=C sort -m %s -o .new.merged-segment" % (
         ' '.join(name for size, name in files[:ii+1]))
     print "followed by renaming, deleting the old files, and building the skip file"
     print "(actually doing it isn't implemented yet)"
