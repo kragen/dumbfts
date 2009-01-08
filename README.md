@@ -274,7 +274,7 @@ the total number of index segments is large.
 Bugs
 ----
 
-- It doesn’t automatically merge indices or generate skip files.
+- It doesn’t automatically merge indices.
 - It doesn’t do any kind of query optimization to avoid fetching
   millions of useless postings for common words.  This limits its use
   to corpuses of a few million documents at most.
@@ -299,8 +299,16 @@ Bugs
   gets worse as corpus sizes get bigger.  If index segments output
   from a merge were partitioned into independently-mergeable subfiles
   by key-space subdivision, this could 
-- I think there’s a bug in `skiplook.py` that will prevent successful
-  retrieval of the first posting in an index segment.
+- There’s a bug in `skiplook.py` that will prevent successful
+  retrieval of the first posting in an index segment:
+      Traceback (most recent call last):
+        File "/home/kragen/devel/dumbfts/skiplook.py", line 54, in ?
+          main(sys.argv[1], sys.argv[2:])
+        File "/home/kragen/devel/dumbfts/skiplook.py", line 49, in main
+          lines.next()                    # discard first line
+        File "/home/kragen/devel/dumbfts/skiplook.py", line 26, in skiplook
+          skipline = skiplook(prefix, skipfilename(filename)).next()
+      StopIteration
 - It doesn’t have an option to return results from the part of the
   mailbox that hasn’t been indexed yet.
 - The information about which part of the mailbox has been indexed is
