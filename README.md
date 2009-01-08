@@ -10,6 +10,22 @@ hours to index the two new gigabytes of email.  It manages to index
 about 24 megabytes per minute, which is a bit faster than I
 can download my email over my internet connection.
 
+From [Earl] (http://earl.strain.at/space/comments-2008-12-23):
+
+> 8m18s to index a 1.3 GB mbox on my dual-core 2.6GHz notebook. The
+> resulting index is 1.2GB according to `du` and spread over 27
+> segments.
+> 
+> Without any post-processing, most queries take between 6 to 10
+> seconds wall clock on the same machine, as measured by `time fts
+> mbox query > /dev/null`. Query time doesn't change much if I store
+> the index in memory (on a ramfs), but I've 4GB memory here, so the
+> index was in a fs cache even without ramfs.
+
+Perhaps unsurprisingly, that’s about 6× faster at indexing than my
+machine.  I have some hope that he’ll get better query performance
+with some changes I’ve made since then.
+
 Feature list
 ------------
 
