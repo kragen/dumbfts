@@ -77,9 +77,9 @@ Architecture
 
 It stores a bunch of index segments in an index directory; each one is
 a sorted list of postings.  Off to the side of each index segment,
-there is a “skip file” which is smaller, about 6000 times smaller in
+there is a “skip file” which is smaller, about 1400 times smaller in
 my case, although that’s a tunable parameter; it contains about one
-out of every 6000 or so postings from the index segment, along with
+out of every 1400 or so postings from the index segment, along with
 the position where it can be found in the index segment.  Index
 segments are generated at some manageable size and then merged into
 new, larger index segments later on.
@@ -88,7 +88,7 @@ If this design sounds familiar it’s probably because it’s exactly like
 Lucene.
 
 So, to find a term in a 2.0-gibibyte index segment, we start reading
-through the skip file (346 kibibytes in my example case), and stop as
+through the skip file (1.3 mebibytes in my example case), and stop as
 soon as we find something later than the term, on average a little
 over halfway through.  At that point we open the index segment, seek
 to the last posting mentioned in the skip file before the term we’re
@@ -97,17 +97,22 @@ find all the postings we’re looking for.
 
 Most terms have relatively few postings — in fact, the vast majority
 have only a single posting, although those tend not to get searched
-for — so we will usually have to read less than 6000 postings from the
-index segment, maybe a bit over 3000 on average.
+for — so we will usually have to read less than 1400 postings from the
+index segment, maybe a bit over 700 on average.
 
-So we opened the skip file, read about half of it (one seek and 5000
-postings, which are 170kiB), opened the index file and read a chunk
-from the middle of it (one seek and 3000 postings, which are 98kiB),
-and got our result.  My laptop disk transfers almost 9 megabytes per
-second, so that’s about 3ms of I/O bandwidth.
+Now, actually, the above is a bit of a lie.  Because this skip file is
+so large, it has a skip file of its own, which is only 1219 bytes.  So
+rather than plow through the 1.3 mebibytes of the skip file looking
+for the term, we read through (about half of) the 29 entries in the
+skip file’s skip file, then read through up to 1400 or so entries
+somewhere in the middle of the main skip file, and then read through
+up to 1400 or so entries in the index segment itself.  So that’s three
+seeks and a bit over 1400 entries of I/O, totaling about 50 kilobytes.
+My laptop disk transfers almost 9 megabytes per second, so that’s
+about 6ms of I/O bandwidth.
 
-So to look up a single rare term in a single index segment is 3ms of
-data transfer, 20ms of seeking, and processing 8000 lines in Python,
+So to look up a single rare term in a single index segment is 6ms of
+data transfer, 30ms of seeking, and processing 1400 lines in Python,
 so somewhere around 30ms.  To look up N rare terms in M index files is
 then N×M×30ms.  Right now I have 10 index segments.
 
@@ -318,7 +323,7 @@ The overall structure that allows it to be efficient is Lucene’s,
 which is Doug Cutting’s design, although of course Lucene differs from
 this software by not being stupid.
 
-Kragen Javier Sitaker wrote the software in 2008.  It is dedicated to
+Kragen Javier Sitaker wrote the software in 2008 and 2009.  It is dedicated to
 the public domain.
 
 Misc
