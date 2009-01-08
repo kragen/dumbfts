@@ -2,7 +2,7 @@ Dumb Full Text Search
 =====================
 
 This is a full-text indexing and search engine for my email, in about
-250 lines of code.  It can produce results for many (most?) queries on
+270 lines of code.  It can produce results for many (most?) queries on
 my 12-gigabyte mailbox in under two seconds on my 700MHz laptop.
 (Which sometimes reduces its clock rate to 550MHz.)  I just updated
 the index after not doing so for three months, and it took about three
@@ -160,13 +160,21 @@ atomically renamed to “index-segment.6244.1” once they have been
 generated.  Skip files for them, which don’t exist unless you generate
 them manually, should be in files with the same name, but with
 “.skip.” at the beginning of their names, like
-“.skip.index-segment.6244.1”.  To generate a skip file:
+“.skip.index-segment.6244.1”.  To generate all needed skip files
+automatically:
 
-    $ sparse.py 200000 ~/mail/mailbox.idx/index-segment.6244.1 > \
-                       ~/mail/mailbox.idx/.skip.index-segment.6244.1
+    $ buildskips.py 50000 ~/mail/mailbox.idx/*
 
-The number “200000” is a tunable parameter called “chunksize”.  200000
-is a reasonable value.
+If you want to build a single skip file manually, although I think the
+necessity for this is past:
+
+    $ sparse.py 50000 ~/mail/mailbox.idx/index-segment.6244.1 > \
+                      ~/mail/mailbox.idx/.skip.index-segment.6244.1
+
+The number “50000” is a tunable parameter called “chunksize”.  50000
+is a reasonable value.  I used to use 200000, but 50000 gives me much
+better performance.  12500 gives about the same performance as 50000
+(more disk, less CPU) but takes a lot longer to build the skipfiles.
 
 If you have a whole bunch of index segments and it’s slowing down your
 searches, you should merge them.  Any file in the index directory
@@ -177,8 +185,7 @@ whose name doesn’t begin with a “.” will be used as an index segment.
     $ mv ~/mail/mailbox.idx/.new.merged-segment-serno \
          ~/mail/mailbox.idx/merged-segment-serno
     $ rm ~/mail/mailbox.idx/index-segment.*
-    $ sparse.py 200000 ~/mail/mailbox.idx/merged-segment-serno > \
-                       ~/mail/mailbox.idx/.skip.merged-segment-serno
+    $ buildskips.py 50000 ~/mail/mailbox.idx/*
 
 In the third step, make sure you’re only deleting the
 `index-segment.*` files that you merged together in the first step.
@@ -230,6 +237,9 @@ merging, inversely proportional to log(N).  In a 100GB index with N=4,
 each posting will pass through about 6 merges on the way to the final
 index, for a final I/O cost of 1100GB.  If N=10, it need only pass
 through about 3 merges.
+
+The program `merge.py` examines a set of index segments and suggests
+such a merge, using N=5, if possible.
 
 A smarter merging policy might perform smaller merges more eagerly,
 bigger merges more reluctantly, and perform merges more eagerly when
