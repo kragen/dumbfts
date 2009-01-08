@@ -130,9 +130,9 @@ byte 47638180 contains the word “headers” in the message header
 Usage
 -----
 
-To generate new index segments for a mailbox:
+To generate new index segments and skip files for a mailbox:
 
-    $ indexmail.py ~/mail/themailbox
+    $ indexmail.py ~/mail/mailbox
 
 To find all messages containing a word beginning with “curt”:
 
@@ -157,24 +157,11 @@ approaching reasonable performance.
 The index is in `~/mail/mailbox.idx`.  New index segments are created
 in this directory with names like “.new-index.segment.6244.1” and
 atomically renamed to “index-segment.6244.1” once they have been
-generated.  Skip files for them, which don’t exist unless you generate
-them manually, should be in files with the same name, but with
+generated.  Skip files for them, which are generated automatically,
+should be in files with the same name, but with
 “.skip.” at the beginning of their names, like
-“.skip.index-segment.6244.1”.  To generate all needed skip files
-automatically:
-
-    $ buildskips.py 50000 ~/mail/mailbox.idx/*
-
-If you want to build a single skip file manually, although I think the
-necessity for this is past:
-
-    $ sparse.py 50000 ~/mail/mailbox.idx/index-segment.6244.1 > \
-                      ~/mail/mailbox.idx/.skip.index-segment.6244.1
-
-The number “50000” is a tunable parameter called “chunksize”.  50000
-is a reasonable value.  I used to use 200000, but 50000 gives me much
-better performance.  12500 gives about the same performance as 50000
-(more disk, less CPU) but takes a lot longer to build the skipfiles.
+“.skip.index-segment.6244.1”.  Sometimes skip files have skip files 
+of their own, with names like “.skip.skip.index-segment.6244.1”.
 
 If you have a whole bunch of index segments and it’s slowing down your
 searches, you should merge them.  Any file in the index directory
@@ -185,10 +172,28 @@ whose name doesn’t begin with a “.” will be used as an index segment.
     $ mv ~/mail/mailbox.idx/.new.merged-segment-serno \
          ~/mail/mailbox.idx/merged-segment-serno
     $ rm ~/mail/mailbox.idx/index-segment.*
-    $ buildskips.py 50000 ~/mail/mailbox.idx/*
 
 In the third step, make sure you’re only deleting the
 `index-segment.*` files that you merged together in the first step.
+
+Then you need to generate skip files for the new merged segments.
+To generate all needed skip files
+automatically:
+
+    $ buildskips.py 50000 ~/mail/mailbox.idx/*
+
+If you want to build a single skip file manually, although I think the
+necessity for this is past:
+
+    $ sparse.py 50000 ~/mail/mailbox.idx/merged-segment-serno > \
+                      ~/mail/mailbox.idx/.skip.index-segment-serno
+
+The number “50000” is a tunable parameter called “chunksize”.  50000
+is a reasonable value.  I used to use 200000, but 50000 gives me much
+better performance.  12500 gives about the same performance as 50000
+(more disk, less CPU) but takes a lot longer to build the skipfiles.
+50000 is the `chunksize` that `indexmail.py` uses when it initially
+generates skipfiles.
 
 There’s a file in the index directory called `.indexed-up-to` that
 tells how much of the mailbox file has been indexed.

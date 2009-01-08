@@ -26,7 +26,9 @@ TO DO:
 """
 
 import os, sys, re, errno
-import util
+import util, buildskips
+
+chunksize = 50000
 
 class MissingFromLine(Exception): pass
 
@@ -139,6 +141,7 @@ def index_until_3(filename, reader, end_bytes, index_out, index_out_sorted):
     seg = fresh_name(os.path.join(index_dir_for(filename),
                                   'index-segment.%s' % os.getpid()))
     os.rename(index_out_sorted, seg)
+    buildskips.build_skipfiles(chunksize, seg)
 
 def index_until_2(filename, reader, end_bytes):
     index_dir = index_dir_for(filename)
