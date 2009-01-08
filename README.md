@@ -2,7 +2,7 @@ Dumb Full Text Search
 =====================
 
 This is a full-text indexing and search engine for my email, in about
-270 lines of code.  It can produce results for many (most?) queries on
+300 lines of code.  It can produce results for many (most?) queries on
 my 12-gigabyte mailbox in under two seconds on my 700MHz laptop.
 (Which sometimes reduces its clock rate to 550MHz.)  I just updated
 the index after not doing so for three months, and it took about three
