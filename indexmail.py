@@ -15,7 +15,6 @@ it.
 
 TO DO:
 - rename functions to something sensible
-- write a script to search the index and spit out relevant messages
 - write a script to intelligently merge index chunks with `sort -m`
 - write something that ingests MIME messages, decoded, instead of
   plain text
@@ -27,6 +26,7 @@ TO DO:
 """
 
 import os, sys, re, errno
+import util
 
 class MissingFromLine(Exception): pass
 
@@ -111,11 +111,6 @@ def sort_file(infile, outfile):
     outsize = os.stat(outfile).st_size
     assert insize == outsize, (insize, outsize)
 
-def commit(file_object):
-    file_object.flush()
-    os.fsync(file_object.fileno())
-    file_object.close()
-
 name_index = 0
 def fresh_name(base):
     global name_index
@@ -135,10 +130,10 @@ def index_until_3(filename, reader, end_bytes, index_out, index_out_sorted):
     def add_term(term, offset):
         index_file.write('%s %s\n' % (term, offset))
     index_until(reader, add_term, end_bytes)
-    commit(index_file)
+    util.commit(index_file)
 
     sort_file(index_out, index_out_sorted)
-    commit(open(index_out_sorted, 'r+')) # sort(1) might not fsync(2)
+    util.commit(open(index_out_sorted, 'r+')) # sort(1) might not fsync(2)
 
     # XXX raceable, but that's okay
     seg = fresh_name(os.path.join(index_dir_for(filename),
@@ -184,7 +179,7 @@ def index_some(filename):
     new_indexed_up_to = os.path.join(index_dir, '.new-indexed-up-to')
     new_indexed_up_to_file = open(new_indexed_up_to, 'w')
     new_indexed_up_to_file.write('%s\n' % reader.next_message_offset)
-    commit(new_indexed_up_to_file)
+    util.commit(new_indexed_up_to_file)
     os.rename(new_indexed_up_to, os.path.join(index_dir, '.indexed-up-to'))
 
     return True

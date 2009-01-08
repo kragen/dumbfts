@@ -6,7 +6,7 @@ Doesn’t bother rebuilding skip files that already exist; it assumes
 they’re correct.
 
 """
-import sys, sparse, os, skiplook, cgitb, indexmail
+import sys, sparse, os, skiplook, cgitb, util
 
 def build_skipfiles(chunksize, infilename):
     outfilename = skiplook.skipfilename(infilename)
@@ -14,7 +14,7 @@ def build_skipfiles(chunksize, infilename):
         print "building skipfile for `%s`  " % infilename
         outfile = file(outfilename + '.new', 'w')
         sparse.main(chunksize, infilename, outfile)
-        indexmail.commit(outfile)
+        util.commit(outfile)
         os.rename(outfilename + '.new', outfilename)
 
     size = os.stat(outfilename).st_size
