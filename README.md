@@ -300,17 +300,7 @@ Bugs
   from a merge were partitioned into independently-mergeable subfiles
   by key-space subdivision, this could 
 - There’s a bug in `skiplook.py` that will prevent successful
-  retrieval of the first posting in an index segment:
-
-        Traceback (most recent call last):
-          File "/home/kragen/devel/dumbfts/skiplook.py", line 54, in ?
-            main(sys.argv[1], sys.argv[2:])
-          File "/home/kragen/devel/dumbfts/skiplook.py", line 49, in main
-            lines.next()                    # discard first line
-          File "/home/kragen/devel/dumbfts/skiplook.py", line 26, in skiplook
-            skipline = skiplook(prefix, skipfilename(filename)).next()
-        StopIteration
-
+  retrieval of the first posting in an index segment.
 - It doesn’t have an option to return results from the part of the
   mailbox that hasn’t been indexed yet.
 - The information about which part of the mailbox has been indexed is

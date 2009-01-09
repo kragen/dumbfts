@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 "Like 'look' but using .skip files."
 import sys, os
 
@@ -46,9 +47,9 @@ def skiplook(prefix, filename):
 def main(prefix, files):
     for eachfile in files:
         lines = skiplook(prefix, eachfile)
-        lines.next()                    # discard first line
         for line in lines:
-            sys.stdout.write(line)
+            if line.startswith(prefix): # first line usually won’t
+                sys.stdout.write(line)
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2:])
